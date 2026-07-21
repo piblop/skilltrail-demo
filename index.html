@@ -109,6 +109,24 @@
   .path .bar div { height:100%; background:var(--lime); }
   .path a { display:block; text-align:center; background:var(--lime); color:var(--ink); border-radius:8px; padding:10px; font-weight:700; font-size:13px; text-decoration:none; margin-top:16px; }
 
+  /* guided tour */
+  #tourCursor { position:fixed; z-index:60; width:26px; height:26px; pointer-events:none; opacity:0;
+    transition:top .85s cubic-bezier(.4,0,.2,1), left .85s cubic-bezier(.4,0,.2,1), opacity .3s; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+  #tourTip { position:fixed; z-index:59; max-width:270px; background:var(--ink); color:var(--paper);
+    border-radius:8px; padding:11px 14px; font-size:12.5px; line-height:1.45; opacity:0; transition:opacity .3s;
+    pointer-events:none; border:1.5px solid var(--ink); }
+  #tourTip b { color:var(--lime); }
+  .tour-hl { outline:3px solid var(--lime) !important; outline-offset:3px; border-radius:6px;
+    box-shadow:0 0 0 6px rgba(219,236,154,.35) !important; transition:box-shadow .3s; }
+  .tour-pulse { position:fixed; z-index:58; width:14px; height:14px; border-radius:50%; background:var(--lime);
+    border:2px solid var(--ink); pointer-events:none; animation:tpulse .5s ease-out forwards; }
+  @keyframes tpulse { from { transform:scale(.6); opacity:1; } to { transform:scale(2.6); opacity:0; } }
+  #tourBar { position:fixed; right:14px; bottom:14px; z-index:61; }
+  #tourBar button { background:var(--ink); color:var(--paper); border:1.5px solid var(--ink); border-radius:20px;
+    padding:9px 16px; font:inherit; font-weight:600; font-size:12.5px; cursor:pointer; }
+  #tourBar button.replay { background:var(--lime); color:var(--ink); }
+  @media (prefers-reduced-motion: reduce) { #tourCursor { transition:opacity .3s; } }
+
   .lab { font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:22px 0 10px; }
   .bullet { border-left:3px solid var(--lime); padding:2px 0 2px 13px; margin-bottom:12px; }
   .bullet .t { font-size:13.5px; line-height:1.5; }
@@ -165,6 +183,7 @@ function tryGate(){
   if (document.getElementById('pw').value.trim() === 'skill1') {
     document.getElementById('gate').style.display = 'none';
     document.getElementById('app').style.display = 'block';
+    setTimeout(startTour, 900);
   } else {
     document.getElementById('gerr').textContent = "That password doesn't match — check with whoever sent you the link.";
   }
@@ -215,7 +234,7 @@ function jobCard(j){
 }
 const P = D.pathways;
 const scoreHow =
-  '<div style="border:1.5px solid var(--ink);border-radius:8px;background:var(--card);padding:16px 18px;margin-bottom:6px">' +
+  '<div id="howscore" style="border:1.5px solid var(--ink);border-radius:8px;background:var(--card);padding:16px 18px;margin-bottom:6px">' +
   '<div class="lab" style="margin:0 0 8px">How the score is determined</div>' +
   '<div style="font-size:12.5px;color:var(--muted);line-height:1.55">Every role is scored 0–100 from the student\'s record and graded like a subject ' +
   '(85+ High Distinction · 75+ Distinction · 65+ Credit · 50+ Pass):<br>' +
@@ -249,6 +268,95 @@ document.getElementById('s2').innerHTML =
   '</div><div><div class="lab">Mentor assist — LinkedIn link-outs</div>' +
   K.mentors.map(m => `<a class="ml" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.label)} →</a>`).join('') +
   '</div></div>';
+
+/* ============ guided tour: animated pointer + captions ============ */
+const TOUR = [
+  { tab:0, sel:() => document.querySelector('.subj'),
+    text:'<b>Step 1.</b> Enter your subjects exactly as they appear on your transcript — the engine reads each one\'s official handbook description.' },
+  { tab:0, sel:() => { const m=[...document.querySelectorAll('.subj')].find(s=>s.querySelector('.mk')?.textContent==='98'); return m?.querySelector('.mk')||m; },
+    text:'<b>Marks show competency.</b> A 98 in Financial Modelling lifts the confidence of every skill that subject proves.' },
+  { tab:0, sel:() => document.querySelector('.chip'),
+    text:'<b>Skills, with receipts.</b> Every extracted skill cites the subject (or real experience) it came from.' },
+  { tab:1, sel:() => document.getElementById('howscore'),
+    text:'<b>Step 2.</b> Roles are scored 0–100 from your record — evidence, breadth, title and handbook-corpus overlap. The arithmetic is always shown.' },
+  { tab:1, sel:() => document.querySelector('.mark'),
+    text:'<b>Graded like a subject.</b> 100 — High Distinction. Australian students read this instantly.' },
+  { tab:1, sel:() => document.querySelector('.ev'),
+    text:'<b>The evidence chain.</b> Subject → skill → the exact line in the ad that asks for it. Plus what\'s missing, with a free fix.' },
+  { tab:1, sel:() => document.querySelector('.flag.live'),
+    text:'<b>Green = real.</b> Live listings come from Adzuna and official employer job-board APIs — the link opens the actual ad.' },
+  { tab:1, sel:() => document.querySelector('.path'),
+    text:'<b>Where grads like you go.</b> QILT outcome data plus a LinkedIn Alumni link-out — see real people who made the jump.' },
+  { tab:2, sel:() => document.querySelector('.bullet'),
+    text:'<b>Step 3.</b> Resume bullets built only from what you entered — each one traces to its source. Nothing invented, ever.' },
+  { tab:2, sel:() => document.querySelector('.cover'),
+    text:'<b>A cover letter that leads with capability</b> — not apologies for missing industry experience.' },
+  { tab:2, sel:() => document.querySelector('.ml'),
+    text:'<b>Mentor assist.</b> LinkedIn people-search link-outs plus a respectful outreach template. That\'s the whole journey — subjects in, applications out.' },
+];
+
+let tourStep = -1, tourTimer = null, tourOn = false;
+const cursorEl = () => document.getElementById('tourCursor');
+const tipEl = () => document.getElementById('tourTip');
+
+function ensureTourEls(){
+  if (cursorEl()) return;
+  document.body.insertAdjacentHTML('beforeend',
+    '<svg id="tourCursor" viewBox="0 0 24 24"><path d="M4 2 L20 12 L12.5 13.5 L16 21 L13 22.4 L9.6 14.8 L4 19.5 Z" fill="#16150F" stroke="#F7F5EE" stroke-width="1.4"/></svg>' +
+    '<div id="tourTip"></div>' +
+    '<div id="tourBar"><button onclick="endTour()">Skip tour ⏭</button></div>');
+}
+
+function tourGoto(i){
+  if (i >= TOUR.length) { endTour(); return; }
+  tourStep = i;
+  const step = TOUR[i];
+  const tabBtns = document.querySelectorAll('.tabs button');
+  tab(step.tab, tabBtns[step.tab]);
+  const el = step.sel();
+  if (!el) { tourGoto(i + 1); return; }
+  document.querySelectorAll('.tour-hl').forEach(x => x.classList.remove('tour-hl'));
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
+  setTimeout(() => {
+    const r = el.getBoundingClientRect();
+    const cx = Math.min(r.left + Math.min(r.width * .35, 180), innerWidth - 40);
+    const cy = r.top + r.height / 2;
+    const c = cursorEl();
+    c.style.opacity = 1; c.style.left = cx + 'px'; c.style.top = cy + 'px';
+    setTimeout(() => {
+      // click pulse + highlight + caption
+      const p = document.createElement('div');
+      p.className = 'tour-pulse'; p.style.left = (cx - 2) + 'px'; p.style.top = (cy - 2) + 'px';
+      document.body.appendChild(p); setTimeout(() => p.remove(), 600);
+      el.classList.add('tour-hl');
+      const t = tipEl();
+      t.innerHTML = TOUR[i].text; t.style.opacity = 1;
+      const tw = Math.min(280, innerWidth - 28);
+      let tx = Math.min(cx + 20, innerWidth - tw - 12), ty = cy + 26;
+      if (ty > innerHeight - 130) ty = Math.max(10, cy - 120);
+      t.style.left = Math.max(10, tx) + 'px'; t.style.top = ty + 'px';
+    }, 900);
+    tourTimer = setTimeout(() => tourGoto(i + 1), 4300);
+  }, 450);
+}
+
+function startTour(){
+  ensureTourEls();
+  tourOn = true;
+  document.querySelector('#tourBar button').outerHTML = '<button onclick="endTour()">Skip tour ⏭</button>';
+  tourGoto(0);
+}
+
+function endTour(){
+  tourOn = false;
+  clearTimeout(tourTimer);
+  document.querySelectorAll('.tour-hl').forEach(x => x.classList.remove('tour-hl'));
+  const c = cursorEl(), t = tipEl();
+  if (c) c.style.opacity = 0;
+  if (t) t.style.opacity = 0;
+  const bar = document.querySelector('#tourBar button');
+  if (bar) bar.outerHTML = '<button class="replay" onclick="startTour()">▶ Replay tour</button>';
+}
 </script>
 </body>
 </html>
