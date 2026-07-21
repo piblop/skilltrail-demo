@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>SkillTrail — demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#16150F; --paper:#F7F5EE; --canvas:#EFEDE4; --card:#FFF; --lime:#DBEC9A; --muted:#57544A; --faint:#8A8175; --hair:#EDE8DE; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--canvas); color:var(--ink); font-family:'Space Grotesk',sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:inherit; }
+  .mono { font-family:'IBM Plex Mono',monospace; }
+  .eyebrow { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.2em; text-transform:uppercase; }
+  .wrap { max-width:1100px; margin:0 auto; padding:28px 20px 80px; }
+  .panel { background:var(--paper); border:1.5px solid var(--ink); border-radius:10px; overflow:hidden; }
+
+  /* gate */
+  #gate { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
+  #gate .box { text-align:center; max-width:420px; width:100%; }
+  #gate h1 { font-size:40px; line-height:1.02; letter-spacing:-.02em; margin:.4rem 0 .5rem; }
+  #gate p { color:var(--muted); font-size:14px; margin:0 0 22px; }
+  #gate input { width:100%; background:var(--card); border:1.5px solid var(--ink); border-radius:6px; padding:13px 14px; font:inherit; font-size:15px; }
+  #gate button { margin-top:12px; width:100%; background:var(--lime); border:1.5px solid var(--ink); border-radius:8px; padding:13px; font:inherit; font-weight:700; font-size:15px; cursor:pointer; }
+  #gate .err { color:#8C1D2F; font-size:13px; margin-top:10px; min-height:18px; }
+
+  /* app */
+  #app { display:none; }
+  .brand { display:flex; align-items:center; gap:8px; margin:6px 0 18px; }
+  .brand .dot { width:10px; height:10px; background:var(--lime); border:1.5px solid var(--ink); border-radius:2px; }
+  .brand b { font-size:17px; }
+  .brand .note { margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); text-transform:uppercase; letter-spacing:.1em; }
+  .hero { padding:30px 34px 24px; border-bottom:1.5px solid var(--ink); }
+  .hero h2 { margin:8px 0 0; font-size:36px; line-height:1; letter-spacing:-.02em; }
+  .hero p { margin:10px 0 0; color:var(--muted); font-size:14px; max-width:560px; }
+  .tabs { display:flex; border-bottom:1.5px solid var(--ink); background:var(--paper); }
+  .tabs button { flex:1; background:none; border:none; border-right:1.5px solid var(--ink); padding:13px; font:inherit; font-weight:600; font-size:13px; cursor:pointer; color:var(--muted); }
+  .tabs button:last-child { border-right:none; }
+  .tabs button.on { background:var(--ink); color:var(--paper); }
+  .sect { display:none; padding:26px 34px 36px; }
+  .sect.on { display:block; }
+
+  .chip { display:inline-flex; align-items:center; gap:6px; background:var(--card); border:1.5px solid var(--ink); border-radius:6px; padding:4px 10px; font-size:12.5px; font-weight:600; margin:0 6px 8px 0; }
+  .chip .c { font-family:'IBM Plex Mono',monospace; font-size:10.5px; background:var(--lime); border-radius:3px; padding:0 4px; }
+  .flag { font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; border:1.5px solid var(--ink); border-radius:4px; padding:2px 6px; margin-right:5px; }
+  .flag.live { background:var(--lime); }
+  .flag.sample { border-color:#C9C6B8; color:var(--faint); }
+  .flag.gate { background:var(--ink); color:var(--paper); }
+
+  .subj { display:flex; align-items:center; gap:12px; background:var(--card); border:1.5px solid var(--ink); border-radius:8px; padding:11px 14px; margin-bottom:8px; flex-wrap:wrap; }
+  .subj .code { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; background:var(--paper); border:1px solid var(--ink); border-radius:4px; padding:2px 7px; }
+  .subj .t { flex:1; font-weight:600; font-size:14px; min-width:180px; }
+  .subj .mk { font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:13px; background:var(--lime); border:1.5px solid var(--ink); border-radius:5px; padding:2px 9px; }
+  .subj .enj { font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:600; text-transform:uppercase; background:var(--lime); border:1.5px solid var(--ink); border-radius:4px; padding:2px 7px; }
+
+  .tier { display:flex; align-items:center; gap:10px; margin:24px 0 12px; flex-wrap:wrap; }
+  .tier .pill { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; background:var(--ink); color:var(--paper); padding:4px 9px; border-radius:4px; }
+  .tier .b { color:var(--muted); font-size:12.5px; }
+  .tier .n { margin-left:auto; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); }
+  .job { border:1.5px solid var(--ink); border-radius:8px; background:var(--card); padding:16px 18px; margin-bottom:12px; }
+  .job .head { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; flex-wrap:wrap; }
+  .job .ti { font-weight:700; font-size:15.5px; }
+  .job .em { color:var(--muted); font-weight:500; font-size:13.5px; margin-top:1px; }
+  .job .me { font-family:'IBM Plex Mono',monospace; color:var(--faint); font-size:10.5px; margin-top:4px; }
+  .job .fl { margin-top:9px; }
+  .mark { text-align:center; background:var(--lime); border:1.5px solid var(--ink); border-radius:8px; padding:7px 12px; min-width:74px; }
+  .mark.low { background:var(--paper); }
+  .mark .n { font-size:24px; font-weight:700; line-height:1; }
+  .mark .g { font-family:'IBM Plex Mono',monospace; font-size:8px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; margin-top:3px; }
+  .ev { margin-top:12px; padding-top:10px; border-top:1.5px solid var(--hair); font-size:12.5px; color:var(--muted); }
+  .ev .prov { font-family:'IBM Plex Mono',monospace; font-size:10.5px; background:var(--paper); border:1px solid var(--ink); border-radius:3px; padding:1px 5px; color:var(--ink); }
+  .ev .row { margin-bottom:5px; line-height:1.45; }
+  .job a.go { display:inline-block; margin-top:10px; background:var(--ink); color:var(--paper); border-radius:6px; padding:8px 13px; font-weight:600; font-size:12.5px; text-decoration:none; }
+
+  .grid2 { display:grid; grid-template-columns:1.7fr 1fr; gap:26px; align-items:start; }
+  @media (max-width:760px){ .grid2 { grid-template-columns:1fr; } .hero h2{font-size:26px;} }
+  .path { background:var(--ink); color:var(--paper); border-radius:10px; padding:22px; }
+  .path .ey { color:var(--lime); }
+  .path .area { font-size:19px; font-weight:700; margin-top:6px; }
+  .path .sal { font-size:26px; font-weight:700; color:var(--lime); }
+  .path .cap { font-size:11.5px; color:#A9A594; margin-top:10px; }
+  .path .row { display:flex; justify-content:space-between; font-size:12px; margin:10px 0 4px; }
+  .path .row span:last-child { font-family:'IBM Plex Mono',monospace; color:var(--lime); }
+  .path .bar { height:5px; background:#33322A; border-radius:3px; overflow:hidden; }
+  .path .bar div { height:100%; background:var(--lime); }
+  .path a { display:block; text-align:center; background:var(--lime); color:var(--ink); border-radius:8px; padding:10px; font-weight:700; font-size:13px; text-decoration:none; margin-top:16px; }
+
+  .lab { font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:22px 0 10px; }
+  .bullet { border-left:3px solid var(--lime); padding:2px 0 2px 13px; margin-bottom:12px; }
+  .bullet .t { font-size:13.5px; line-height:1.5; }
+  .bullet .s { font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--faint); margin-top:3px; }
+  .cover { background:var(--card); border:1.5px solid var(--ink); border-radius:8px; padding:18px 20px; font-size:13px; line-height:1.6; white-space:pre-wrap; }
+  .tip { display:flex; gap:8px; font-size:13px; line-height:1.5; margin-bottom:9px; }
+  .ml { display:block; background:var(--card); border:1.5px solid var(--ink); border-radius:6px; padding:9px 12px; font-size:12.5px; font-weight:500; text-decoration:none; margin-bottom:8px; }
+  .foot { color:var(--faint); font-size:11px; margin-top:26px; line-height:1.5; }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="box">
+    <div class="eyebrow" style="color:var(--muted)">Private preview — static demo</div>
+    <h1>Your subjects are the&nbsp;experience.</h1>
+    <p>SkillTrail — a free service for Australian new graduates.</p>
+    <input id="pw" type="password" placeholder="Access password" autocomplete="off">
+    <button onclick="tryGate()">Enter →</button>
+    <div class="err" id="gerr"></div>
+  </div>
+</div>
+
+<div id="app"><div class="wrap">
+  <div class="brand"><span class="dot"></span><b>SkillTrail</b><span class="note">Static demo · snapshot of the live pipeline</span></div>
+  <div class="panel">
+    <div class="hero">
+      <div class="eyebrow">Demo — UNSW Master of Analytics transcript</div>
+      <h2>Your record vs. the market.</h2>
+      <p>A real transcript, enriched from the university handbook, distilled to a skills profile, and graded against live Australian job listings — every match traceable to the subject that proves it.</p>
+    </div>
+    <div class="tabs">
+      <button class="on" onclick="tab(0,this)">01 — The record</button>
+      <button onclick="tab(1,this)">02 — Matches</button>
+      <button onclick="tab(2,this)">03 — Application kit</button>
+    </div>
+    <div class="sect on" id="s0"></div>
+    <div class="sect" id="s1"></div>
+    <div class="sect" id="s2"></div>
+  </div>
+  <div class="foot">
+    Static snapshot for demonstration — the full app enriches any student's subjects and fetches live roles at run time.
+    Roles marked <b>LIVE</b> were real listings (Adzuna &amp; official employer job-board APIs) at snapshot time; <b>SAMPLE</b> roles are fictional demo data.
+    Pathway figures compiled from public QILT Graduate Outcomes Survey summaries — verify at qilt.edu.au. No scraping of Seek, Indeed, LinkedIn or GradConnection; LinkedIn is link-out only.
+  </div>
+</div></div>
+
+<script id="data" type="application/json">{"subjects": [{"code": "ZZBU6501", "title": "Introductory Data Analysis", "mark": null, "enjoyed": false}, {"code": "ZZBU6502", "title": "Analytics and Business", "mark": null, "enjoyed": false}, {"code": "ZZBU6503", "title": "Managing People, Analytics and Change", "mark": null, "enjoyed": false}, {"code": "ZZBU6505", "title": "Data and Ethics", "mark": 83, "enjoyed": false}, {"code": "ZZEN9021", "title": "Principles of Programming", "mark": null, "enjoyed": false}, {"code": "ZZBU6507", "title": "Data Visualisation and Communication", "mark": 87, "enjoyed": false}, {"code": "ZZBU6511", "title": "Predictive Analytics", "mark": 82, "enjoyed": false}, {"code": "ZZBU6516", "title": "Database Management", "mark": 95, "enjoyed": true}, {"code": "ZZBU6601", "title": "General Analytics Capstone", "mark": 82, "enjoyed": false}, {"code": "ZZBU6508", "title": "Analytics and Consulting", "mark": 84, "enjoyed": false}, {"code": "ZZBU6509", "title": "Financial Modelling", "mark": 98, "enjoyed": true}, {"code": "COMM3015", "title": "Postgraduate Elective (Transfer Credit)", "mark": null, "enjoyed": false}], "skills": [{"skill": "Financial modelling & valuation", "conf": 89, "prov": "ZZBU6509"}, {"skill": "Excel & spreadsheets", "conf": 89, "prov": "ZZBU6509"}, {"skill": "Business analytics & insight", "conf": 87, "prov": "ZZBU6516"}, {"skill": "SQL & databases", "conf": 87, "prov": "ZZBU6516"}, {"skill": "Data engineering & ETL", "conf": 87, "prov": "ZZBU6516"}, {"skill": "Data visualisation & storytelling", "conf": 84, "prov": "ZZBU6507"}, {"skill": "Business intelligence & reporting", "conf": 84, "prov": "ZZBU6507"}, {"skill": "Data analysis", "conf": 82, "prov": "ZZBU6505"}, {"skill": "Consulting & problem structuring", "conf": 82, "prov": "ZZBU6508"}, {"skill": "Data ethics & governance", "conf": 82, "prov": "ZZBU6505"}, {"skill": "Statistics & regression", "conf": 81, "prov": "ZZBU6511"}, {"skill": "Predictive modelling & machine learning", "conf": 81, "prov": "ZZBU6511"}, {"skill": "Applied project delivery", "conf": 80, "prov": "Analytics capstone delivering an end-to-end data solution for a real business..."}, {"skill": "Programming (Python)", "conf": 72, "prov": "self-reported: Python"}, {"skill": "MATLAB / Python modelling", "conf": 55, "prov": "ZZEN9021"}, {"skill": "Data structures & algorithms", "conf": 55, "prov": "ZZEN9021"}], "tiers": {"Aligned": [{"title": "Graduate Data Analyst", "employer": "Compass Analytics", "loc": "Sydney, NSW", "salary": "$75,000 - $85,000", "score": 100, "grade": "High Distinction", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 72, "breadth": 12, "title": 12, "corpus": 8}, "why": [{"prov": "ZZBU6505", "skill": "Data analysis", "req": "data analyst"}, {"prov": "ZZBU6511", "skill": "Statistics & regression", "req": "Strong statistics and programming skills required"}, {"prov": "self-reported: Python", "skill": "Programming (Python)", "req": "Build models in Python, run statistical analyses and regressions, visualise findings and present recommendatio"}], "gaps": []}, {"title": "Graduate Data Scientist (Public Sector)", "employer": "Bureau of Economic Statistics", "loc": "Canberra, ACT", "salary": "$80,000 - $90,000", "score": 100, "grade": "High Distinction", "real": false, "gate": true, "url": "", "breakdown": {"base": 30, "evidence": 61, "breadth": 9, "title": 24, "corpus": 5}, "why": [{"prov": "ZZBU6505", "skill": "Data analysis", "req": "Build regression and forecasting models, clean and analyse data, and communicate results"}, {"prov": "ZZBU6511", "skill": "Statistics & regression", "req": "Apply statistics and econometrics to national datasets"}, {"prov": "ZZBU6511", "skill": "Predictive modelling & machine learning", "req": "data scientist"}], "gaps": []}, {"title": "Graduate Analytics Consultant", "employer": "Compass Analytics", "loc": "Melbourne, VIC", "salary": "$78,000 - $88,000", "score": 100, "grade": "High Distinction", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 94, "breadth": 15, "title": 12, "corpus": 9}, "why": [{"prov": "ZZBU6516", "skill": "Business analytics & insight", "req": "analytics"}, {"prov": "ZZBU6508", "skill": "Consulting & problem structuring", "req": "Suits quantitative graduates who enjoy client-facing work"}, {"prov": "ZZBU6511", "skill": "Predictive modelling & machine learning", "req": "Frame problems, build statistical and machine-learning models in Python, and communicate insights"}], "gaps": []}, {"title": "Finance Data Analyst", "employer": "WorldLink Communications", "loc": "Harristown, Toowoomba", "salary": "", "score": 100, "grade": "High Distinction", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5797481952?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 86, "breadth": 12, "title": 12, "corpus": 2}, "why": [{"prov": "ZZBU6509", "skill": "Financial modelling & valuation", "req": "Key Responsibilities Data Analytics & Business Intelligence: Perform complex financial modeling and analysis t"}, {"prov": "ZZBU6516", "skill": "Business analytics & insight", "req": "Role Description We are seeking a qualified Finance Data Analyst with advanced data analytics capabilities for"}, {"prov": "ZZBU6507", "skill": "Business intelligence & reporting", "req": "Key Responsibilities Data Analytics & Business Intelligence: Perform complex financial modeling and analysis t"}], "gaps": []}, {"title": "Vacationer Program | SR&T | Risk Data & Analytics", "employer": "Deloitte", "loc": "Bayswater, Bayswater Area", "salary": "", "score": 100, "grade": "High Distinction", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5783851611?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 117, "breadth": 18, "title": 12, "corpus": 10}, "why": [{"prov": "ZZBU6516", "skill": "Business analytics & insight", "req": "Job Requisition ID: 40379 Work on live data challenges across regulatory compliance, ESG, and operational risk"}, {"prov": "ZZBU6516", "skill": "SQL & databases", "req": "Job Requisition ID: 40379 Work on live data challenges across regulatory compliance, ESG, and operational risk"}, {"prov": "ZZBU6507", "skill": "Data visualisation & storytelling", "req": "Job Requisition ID: 40379 Work on live data challenges across regulatory compliance, ESG, and operational risk"}], "gaps": []}, {"title": "Admin Data analyst", "employer": "JobRadars - AU", "loc": "East Bowral, Bowral Area", "salary": "", "score": 100, "grade": "High Distinction", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5776593903?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 84, "breadth": 12, "title": 12, "corpus": 7}, "why": [{"prov": "ZZBU6516", "skill": "SQL & databases", "req": "Location: Goulburn, NSW, Australia Key Requirements Engineering Graduate (Mandatory) Strong analytical and pro"}, {"prov": "ZZBU6507", "skill": "Data visualisation & storytelling", "req": "Location: Goulburn, NSW, Australia Key Requirements Engineering Graduate (Mandatory) Strong analytical and pro"}, {"prov": "ZZBU6507", "skill": "Business intelligence & reporting", "req": "Location: Goulburn, NSW, Australia Key Requirements Engineering Graduate (Mandatory) Strong analytical and pro"}], "gaps": []}], "Adjacent": [{"title": "Graduate Software Engineer", "employer": "Lumen Software", "loc": "Remote (Australia)", "salary": "$85,000 - $100,000", "score": 96, "grade": "High Distinction", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 54, "breadth": 9, "corpus": 3}, "why": [{"prov": "ZZBU6516", "skill": "Data engineering & ETL", "req": "Build and maintain backend services and data pipelines"}, {"prov": "self-reported: Python", "skill": "Programming (Python)", "req": "Strong programming fundamentals, data structures and algorithms, and a willingness to learn our stack"}, {"prov": "ZZEN9021", "skill": "Data structures & algorithms", "req": "Strong programming fundamentals, data structures and algorithms, and a willingness to learn our stack"}], "gaps": []}, {"title": "Data Graduate", "employer": "Australian Department of Agriculture, Fisheries and Forestry", "loc": "Barton, South Canberra", "salary": "", "score": 68, "grade": "Credit", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5778197935?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 20, "breadth": 3, "title": 12, "corpus": 3}, "why": [{"prov": "ZZBU6505", "skill": "Data analysis", "req": "As a data graduate, you will contribute to data-driven projects that support policy, improve services and info"}], "gaps": []}, {"title": "Graduate Management Consultant", "employer": "Northwind Consulting", "loc": "Sydney, NSW", "salary": "$85,000 - $95,000", "score": 60, "grade": "Pass", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 20, "breadth": 3, "corpus": 7}, "why": [{"prov": "ZZBU6505", "skill": "Data analysis", "req": "Structure problems, analyse data, model options and present recommendations"}], "gaps": []}, {"title": "Occupational Hygienist (Graduate)", "employer": "Hibbs & Associates Pty Ltd", "loc": "Auburn, Auburn Area", "salary": "$65,000 - $80,000", "score": 56, "grade": "Pass", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5800481126?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 20, "breadth": 3, "corpus": 3}, "why": [{"prov": "ZZBU6508", "skill": "Consulting & problem structuring", "req": "About the role This graduate role supports the delivery of occupational health, hygiene, and safety consulting"}], "gaps": []}, {"title": "Graduate Biomedical Scientist", "employer": "Riverstone Diagnostics", "loc": "Melbourne, VIC", "salary": "$70,000 - $78,000", "score": 53, "grade": "Pass", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 20, "breadth": 3}, "why": [{"prov": "ZZBU6505", "skill": "Data analysis", "req": "Requires strong laboratory technique, aseptic practice, data interpretation and attention to detail"}], "gaps": [{"req": "Laboratory technique", "fix": "Document lab methods from your coursework into a short technique portfolio."}, {"req": "Cell & molecular biology", "fix": "Write a short review of a recent paper in the target area."}]}, {"title": "Graduate Finance Systems Consultant", "employer": "JobRadars - AU", "loc": "Barton, South Canberra", "salary": "", "score": 27, "grade": "Below threshold", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5773125389?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 20, "corpus": 7}, "why": [], "gaps": []}], "Stretch": [{"title": "Graduate Sustainability Analyst", "employer": "Terra Verde Consulting", "loc": "Melbourne, VIC", "salary": "$70,000 - $78,000", "score": 83, "grade": "Distinction", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 42, "breadth": 6, "corpus": 5}, "why": [{"prov": "ZZBU6516", "skill": "Business analytics & insight", "req": "Science or engineering background with strong analytics valued"}, {"prov": "ZZBU6505", "skill": "Data analysis", "req": "Analyse data, model emissions scenarios, and translate findings into client recommendations"}], "gaps": []}, {"title": "Legal Counsel - Content Safety, Product & Privacy", "employer": "Canva", "loc": "Sydney", "salary": "", "score": 68, "grade": "Credit", "real": true, "gate": false, "url": "https://jobs.smartrecruiters.com/Canva/6000000001233109", "breakdown": {"base": 30, "evidence": 20, "breadth": 3, "title": 12, "corpus": 3}, "why": [{"prov": "ZZBU6505", "skill": "Data ethics & governance", "req": "privacy"}], "gaps": []}, {"title": "Graduate Program | T&T | Engineering, Artificial Intelligence & Data", "employer": "Deloitte", "loc": "Brisbane CBD, Brisbane", "salary": "", "score": 66, "grade": "Credit", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5783851553?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 20, "breadth": 3, "title": 12, "corpus": 1}, "why": [{"prov": "ZZBU6511", "skill": "Predictive modelling & machine learning", "req": "artificial intelligence"}], "gaps": []}, {"title": "Group Commercial Analyst\u2026Turn Data Into Business Impact Flexible", "employer": "Super Retail Group", "loc": "Bray Park, Pine Rivers Area", "salary": "", "score": 61, "grade": "Pass", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5806685425?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 22, "breadth": 3, "corpus": 6}, "why": [{"prov": "ZZBU6509", "skill": "Financial modelling & valuation", "req": "Working closely with business leaders, you'll deliver insights, build financial models and reporting, and help"}], "gaps": []}, {"title": "Group Commercial Analyst\u2026Turn Data Into Business Impact - Flexible", "employer": "Super Retail Group", "loc": "Bray Park, Pine Rivers Area", "salary": "", "score": 59, "grade": "Pass", "real": true, "gate": false, "url": "https://www.adzuna.com.au/details/5805531572?utm_medium=api&utm_source=b576dc50", "breakdown": {"base": 30, "evidence": 22, "breadth": 3, "corpus": 4}, "why": [{"prov": "ZZBU6509", "skill": "Financial modelling & valuation", "req": "Working closely with business leaders, you'll deliver insights, build financial models and reporting, and help"}], "gaps": []}, {"title": "Graduate CFD / Simulation Engineer", "employer": "Vortex Flow Dynamics", "loc": "Melbourne, VIC", "salary": "$82,000 - $90,000", "score": 58, "grade": "Pass", "real": false, "gate": false, "url": "", "breakdown": {"base": 30, "evidence": 20, "breadth": 3, "corpus": 5}, "why": [{"prov": "ZZBU6508", "skill": "Consulting & problem structuring", "req": "Support consulting projects using computational fluid dynamics"}], "gaps": [{"req": "Computational fluid dynamics (CFD)", "fix": "Run a free OpenFOAM tutorial case and write up the results."}, {"req": "Fluid mechanics", "fix": "Ask the SkillTrail mentor links below how they built this skill early on."}]}]}, "counts": {"Aligned": 32, "Adjacent": 21, "Stretch": 36}, "pathways": {"area": "Mathematics & Statistics", "salary": 74000, "occ": [{"occ": "Data analysts and data scientists", "pct": 28.0}, {"occ": "Actuarial and risk analysts", "pct": 16.0}, {"occ": "Financial and quantitative analysts", "pct": 15.0}, {"occ": "ICT and software roles", "pct": 14.0}, {"occ": "Statisticians and government analysts", "pct": 12.0}], "alumni": "https://www.linkedin.com/school/unsw/people/?keywords=data%20analytics", "source": "QILT Graduate Outcomes Survey 2023"}, "kit": {"role": "Graduate Data Analyst \u2014 Compass Analytics", "bullets": [{"text": "Data analysis \u2014 developed through Data and Ethics (ZZBU6505), covering ethical, legal and privacy considerations in data analytics.", "prov": "ZZBU6505"}, {"text": "Statistics & regression \u2014 developed through Predictive Analytics (ZZBU6511), covering predictive modelling and machine learning: regression, classification, model evaluation and validation.", "prov": "ZZBU6511"}, {"text": "Programming (Python) \u2014 working proficiency with Python.", "prov": "self-reported: Python"}, {"text": "MATLAB / Python modelling \u2014 developed through Principles of Programming (ZZEN9021), covering programming fundamentals for analytics: variables, control flow, functions, data structures and problem decomposition, with practical coding exercises in Python.", "prov": "ZZEN9021"}, {"text": "Financial modelling & valuation \u2014 developed through Financial Modelling (ZZBU6509), covering financial modelling and valuation techniques: building spreadsheet models, forecasting, scenario analysis and valuation to support business decisions.", "prov": "ZZBU6509"}, {"text": "Business analytics & insight \u2014 developed through Database Management (ZZBU6516), covering relational database design, SQL, data modelling and data management for analytics.", "prov": "ZZBU6516"}], "cover": "Dear Hiring Team at Compass Analytics,\n\nI am applying for the Graduate Data Analyst role. My degree at UNSW has given me directly relevant capability \u2014 Financial modelling & valuation, Excel & spreadsheets, Business analytics & insight \u2014 built through subjects such as Introductory Data Analysis (ZZBU6501), Analytics and Business (ZZBU6502), Managing People, Analytics and Change (ZZBU6503). Rather than treat my studies as theory, I have used them to solve concrete problems that mirror the work in this role. Beyond coursework, Analytics capstone delivering an end-to-end data solution for a real business problem, which taught me to apply these skills in a real setting.\n\nWhat draws me to Compass Analytics is the chance to apply these skills where they matter. I am early in my career and learn quickly; I would bring strong fundamentals, genuine interest, and a track record of doing the work well in my subjects.\n\nI would welcome the chance to discuss how my subject-derived skills fit the Graduate Data Analyst role.\n\nKind regards,\n[Your name]", "tips": ["Lead with your Data analysis (from ZZBU6505) \u2014 the role explicitly calls for it.", "Mirror the language of the Compass Analytics posting in your first two bullets.", "Quantify one coursework project (scope, tools, result) to make your skills concrete."], "mentors": [{"label": "People in 'Data Analyst' roles from UNSW", "url": "https://www.linkedin.com/search/results/people/?keywords=Data%20Analyst%20UNSW"}, {"label": "Data Analyst professionals (broad search)", "url": "https://www.linkedin.com/search/results/people/?keywords=Data%20Analyst"}, {"label": "UNSW graduates in this space", "url": "https://www.linkedin.com/search/results/people/?keywords=UNSW%20Data%20Analyst%20Introductory"}]}}</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+
+function tryGate(){
+  // Cosmetic gate only — keeps casual visitors out of a public demo page.
+  if (document.getElementById('pw').value.trim() === 'skill1') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } else {
+    document.getElementById('gerr').textContent = "That password doesn't match — check with whoever sent you the link.";
+  }
+}
+document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryGate(); });
+
+function tab(i, el){
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.sect').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('s' + i).classList.add('on');
+}
+
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+/* 01 — record */
+document.getElementById('s0').innerHTML =
+  '<div class="lab">Subjects as entered — marks show competency</div>' +
+  D.subjects.map(s =>
+    `<div class="subj"><span class="code">${esc(s.code)}</span><span class="t">${esc(s.title)}</span>` +
+    `<span class="mk">${s.mark ?? '—'}</span>` + (s.enjoyed ? '<span class="enj">★ Enjoyed</span>' : '') + '</div>'
+  ).join('') +
+  '<div class="lab">Extracted skills — every skill cites its source</div>' +
+  D.skills.map(k => `<span class="chip">${esc(k.skill)}<span class="c">${k.conf}</span></span>`).join('') +
+  '<div class="foot">Confidence rises with marks; hands-on evidence rises further; self-reported tools are capped and labelled.</div>';
+
+/* 02 — matches */
+const blurb = { Aligned:'Strong match in a field you named or enjoyed.',
+                Adjacent:'Your skills transfer to this nearby field.',
+                Stretch:"A field you'd never search — but your evidence holds up." };
+function jobCard(j){
+  const flags = (j.real ? '<span class="flag live">Live · real listing</span>' : '<span class="flag sample">Sample · demo only</span>')
+    + (j.gate ? '<span class="flag gate">Citizenship / clearance</span>' : '');
+  const bd = j.breakdown && Object.keys(j.breakdown).length
+    ? `<div class="row" style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">score ${j.score} = ` +
+      Object.entries(j.breakdown).map(([k,v]) => `${k} ${v}`).join(' + ') + '</div>'
+    : '';
+  const why = j.why.length
+    ? j.why.map(w => `<div class="row"><span class="prov">${esc(w.prov)}</span> → <b>${esc(w.skill)}</b> → <em>${esc(w.req)}</em></div>`).join('')
+    : '<div class="row" style="font-style:italic">Transferable match — your skills apply, though the ad doesn\'t name them.</div>';
+  const gaps = j.gaps.map(g => `<div class="row">Missing <b>${esc(g.req)}</b> — ${esc(g.fix)}</div>`).join('');
+  const link = j.real && j.url ? `<a class="go" href="${esc(j.url)}" target="_blank" rel="noopener">View the real posting →</a>` : '';
+  return `<div class="job"><div class="head"><div style="flex:1"><div class="ti">${esc(j.title)}</div>` +
+    `<div class="em">${esc(j.employer)}</div><div class="me">${esc(j.loc)}${j.salary ? ' · ' + esc(j.salary) : ''}</div>` +
+    `<div class="fl">${flags}</div></div>` +
+    `<div class="mark${j.score < 50 ? ' low' : ''}"><div class="n">${j.score}</div><div class="g">${esc(j.grade)}</div></div></div>` +
+    `<div class="ev">${bd}${why}${gaps}${link}</div></div>`;
+}
+const P = D.pathways;
+const scoreHow =
+  '<div style="border:1.5px solid var(--ink);border-radius:8px;background:var(--card);padding:16px 18px;margin-bottom:6px">' +
+  '<div class="lab" style="margin:0 0 8px">How the score is determined</div>' +
+  '<div style="font-size:12.5px;color:var(--muted);line-height:1.55">Every role is scored 0–100 from the student\'s record and graded like a subject ' +
+  '(85+ High Distinction · 75+ Distinction · 65+ Credit · 50+ Pass):<br>' +
+  '<b style="color:var(--ink)">Evidence</b> — skills the ad calls for, weighted by confidence (which comes from marks and hands-on experience) · ' +
+  '<b style="color:var(--ink)">Breadth</b> — distinct skills matched (+3 each) · ' +
+  '<b style="color:var(--ink)">Title</b> — skills named in the job title itself (+12, max 2) · ' +
+  '<b style="color:var(--ink)">Corpus</b> — vocabulary the full official handbook descriptions of the student\'s subjects share with the ad text (up to +16).<br>' +
+  'Skills come from reading the handbook course content of each subject taken. Open any role below to see the exact ' +
+  '<span class="prov" style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;border:1px solid var(--ink);border-radius:3px;padding:1px 4px">subject</span> → skill → requirement chain and the score arithmetic.</div></div>';
+document.getElementById('s1').innerHTML =
+  '<div class="grid2"><div>' + scoreHow +
+  ['Aligned','Adjacent','Stretch'].map(t =>
+    `<div class="tier"><span class="pill">${t}</span><span class="b">${blurb[t]}</span><span class="n">${D.counts[t]} roles</span></div>` +
+    D.tiers[t].map(jobCard).join('')
+  ).join('') +
+  '</div><div class="path"><div class="eyebrow ey">Where grads like you go</div>' +
+  `<div class="area">${esc(P.area)}</div><div class="cap">Median starting salary</div><div class="sal">$${P.salary.toLocaleString()}</div>` +
+  P.occ.map(o => `<div class="row"><span>${esc(o.occ)}</span><span>${Math.round(o.pct)}%</span></div><div class="bar"><div style="width:${Math.round(o.pct)}%"></div></div>`).join('') +
+  `<a href="${esc(P.alumni)}" target="_blank" rel="noopener">Open LinkedIn Alumni →</a>` +
+  `<div class="cap" style="text-align:center">${esc(P.source)}</div></div></div>`;
+
+/* 03 — kit */
+const K = D.kit;
+document.getElementById('s2').innerHTML =
+  `<div class="lab">For the top match — ${esc(K.role)}</div>` +
+  '<div class="lab">Resume bullets — nothing invented, every line traces back</div>' +
+  K.bullets.map(b => `<div class="bullet"><div class="t">${esc(b.text)}</div><div class="s">↳ source: ${esc(b.prov)}</div></div>`).join('') +
+  '<div class="lab">Cover letter draft</div>' + `<div class="cover">${esc(K.cover)}</div>` +
+  '<div class="grid2" style="margin-top:22px"><div><div class="lab">Application tips</div>' +
+  K.tips.map(t => `<div class="tip"><span>→</span><span>${esc(t)}</span></div>`).join('') +
+  '</div><div><div class="lab">Mentor assist — LinkedIn link-outs</div>' +
+  K.mentors.map(m => `<a class="ml" href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.label)} →</a>`).join('') +
+  '</div></div>';
+</script>
+</body>
+</html>
