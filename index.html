@@ -127,6 +127,35 @@
   #tourBar button.replay { background:var(--lime); color:var(--ink); }
   @media (prefers-reduced-motion: reduce) { #tourCursor { transition:opacity .3s; } }
 
+  /* pitch landing */
+  #pitch { display:none; }
+  .pitch-hero { padding:46px 38px 38px; border-bottom:1.5px solid var(--ink); }
+  .pitch-hero h2 { margin:10px 0 0; font-size:44px; line-height:1.02; letter-spacing:-.025em; max-width:720px; }
+  .pitch-hero p { margin:16px 0 0; color:var(--muted); font-size:15.5px; line-height:1.6; max-width:620px; }
+  .pitch-grid { display:grid; grid-template-columns:1fr 1fr 1fr; border-bottom:1.5px solid var(--ink); }
+  .pitch-cell { padding:24px 26px 28px; border-right:1.5px solid var(--ink); }
+  .pitch-cell:last-child { border-right:none; }
+  .pitch-cell .n { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); }
+  .pitch-cell h3 { margin:10px 0 8px; font-size:18px; letter-spacing:-.01em; }
+  .pitch-cell p { margin:0; color:var(--muted); font-size:13.5px; line-height:1.6; }
+  .pitch-cell b { color:var(--ink); }
+  .pitch-dark { background:var(--ink); color:var(--paper); padding:30px 38px 34px; }
+  .pitch-dark .ey { color:var(--lime); }
+  .pitch-dark p { margin:12px 0 0; font-size:15px; line-height:1.65; max-width:680px; color:#D8D5C8; }
+  .pitch-dark b { color:var(--lime); }
+  .pitch-cta { padding:26px 38px 30px; display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .pitch-cta button { background:var(--lime); border:1.5px solid var(--ink); border-radius:8px; padding:14px 26px; font:inherit; font-weight:700; font-size:15px; cursor:pointer; }
+  .pitch-cta span { color:var(--faint); font-size:12.5px; }
+  @media (max-width:760px){
+    .pitch-grid { grid-template-columns:1fr; }
+    .pitch-cell { border-right:none; border-bottom:1.5px solid var(--ink); }
+    .pitch-cell:last-child { border-bottom:none; }
+    .pitch-hero { padding:28px 18px 24px; }
+    .pitch-hero h2 { font-size:28px; }
+    .pitch-dark, .pitch-cta { padding-left:18px; padding-right:18px; }
+  }
+  .whylink { margin-left:12px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; cursor:pointer; text-decoration:underline; background:none; border:none; padding:0; font-weight:600; }
+
   .lab { font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:22px 0 10px; }
   .bullet { border-left:3px solid var(--lime); padding:2px 0 2px 13px; margin-bottom:12px; }
   .bullet .t { font-size:13.5px; line-height:1.5; }
@@ -150,8 +179,58 @@
   </div>
 </div>
 
+<div id="pitch"><div class="wrap">
+  <div class="brand"><span class="dot"></span><b>SkillTrail</b><span class="note">Why this exists</span></div>
+  <div class="panel">
+    <div class="pitch-hero">
+      <div class="eyebrow">The problem we're solving</div>
+      <h2>Fresh graduate. Zero years' experience. Every "entry-level" ad wants two.</h2>
+      <p>The graduate job market is the tightest it has been in a decade. Entry-level openings are
+      shrinking while applications per role hit record highs — and AI is absorbing exactly the junior
+      tasks graduates used to cut their teeth on. The old path (degree → grad role → career) is breaking.
+      A new graduate can't compete on work history, because they don't have one.</p>
+    </div>
+    <div class="pitch-grid">
+      <div class="pitch-cell">
+        <div class="n">01 · The insight</div>
+        <h3>Grads aren't inexperienced — their experience is just unread.</h3>
+        <p>A transcript is years of assessed, verified evidence: subjects, marks, capstones.
+        <b>SkillTrail finds you a job from your transcript and academics alone</b> — it reads every
+        subject's official handbook description and turns it into a skills profile where every skill
+        cites the mark that proves it.</p>
+      </div>
+      <div class="pitch-cell">
+        <div class="n">02 · The wedge</div>
+        <h3>When aligned roles are oversubscribed, adjacent roles are the way in.</h3>
+        <p>With entry-level demand this thin, waiting for the perfect-title job means not working.
+        SkillTrail surfaces <b>every role your evidence can support</b> — Aligned, <b>Adjacent</b> and
+        Stretch — so you can take a nearby role, bank real industry experience, and keep moving toward
+        the ideal job from inside the market instead of outside it.</p>
+      </div>
+      <div class="pitch-cell">
+        <div class="n">03 · The moat</div>
+        <h3>Built for a job market AI keeps redrawing.</h3>
+        <p>Job titles are mutating faster than career advice can. Because SkillTrail matches on
+        <b>evidence, not titles</b>, it re-maps you to whatever the market becomes — and its apply kit
+        never fabricates: every resume line traces back to something you actually did.</p>
+      </div>
+    </div>
+    <div class="pitch-dark">
+      <div class="eyebrow ey">Why now</div>
+      <p>Every year Australia produces ~300,000 new graduates chasing a shrinking pool of entry-level
+      roles. They don't need another job board — job boards rank them last on experience. They need the
+      one thing they already own, <b>their academic record</b>, turned into a competitive application.
+      That's SkillTrail: transcript in, evidence-graded matches and an honest apply kit out.</p>
+    </div>
+    <div class="pitch-cta">
+      <button onclick="enterApp()">See it work on a real transcript →</button>
+      <span>3-step demo: record → matches → apply kit. Guided tour included.</span>
+    </div>
+  </div>
+</div></div>
+
 <div id="app"><div class="wrap">
-  <div class="brand"><span class="dot"></span><b>SkillTrail</b><span class="note">Static demo · snapshot of the live pipeline</span></div>
+  <div class="brand"><span class="dot"></span><b>SkillTrail</b><button class="whylink" onclick="showPitch()">← Why SkillTrail</button><span class="note">Static demo · snapshot of the live pipeline</span></div>
   <div class="panel">
     <div class="hero">
       <div class="eyebrow">Demo — UNSW Master of Analytics transcript</div>
@@ -182,13 +261,26 @@ function tryGate(){
   // Cosmetic gate only — keeps casual visitors out of a public demo page.
   if (document.getElementById('pw').value.trim() === 'skill1') {
     document.getElementById('gate').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    setTimeout(startTour, 900);
+    document.getElementById('pitch').style.display = 'block';
+    window.scrollTo(0, 0);
   } else {
     document.getElementById('gerr').textContent = "That password doesn't match — check with whoever sent you the link.";
   }
 }
 document.getElementById('pw').addEventListener('keydown', e => { if (e.key === 'Enter') tryGate(); });
+
+function enterApp(){
+  document.getElementById('pitch').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  window.scrollTo(0, 0);
+  setTimeout(startTour, 900);
+}
+function showPitch(){
+  endTour();
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pitch').style.display = 'block';
+  window.scrollTo(0, 0);
+}
 
 function tab(i, el){
   document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('on'));
