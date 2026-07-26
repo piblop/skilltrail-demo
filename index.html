@@ -156,6 +156,25 @@
   }
   .whylink { margin-left:12px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; cursor:pointer; text-decoration:underline; background:none; border:none; padding:0; font-weight:600; }
 
+  /* how-it-works diagram */
+  .how { padding:28px 38px 34px; border-bottom:1.5px solid var(--ink); }
+  .how-cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+  .hbox { border:1.5px solid var(--ink); border-radius:8px; background:var(--card); padding:14px 16px; }
+  .hbox .hn { font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); }
+  .hbox h4 { margin:6px 0 6px; font-size:14.5px; letter-spacing:-.01em; }
+  .hbox p { margin:0; color:var(--muted); font-size:12.5px; line-height:1.55; }
+  .hbox.dark { background:var(--ink); color:var(--paper); }
+  .hbox.dark .hn { color:var(--lime); }
+  .hbox.dark p { color:#C9C6B8; }
+  .hbox.lime { background:var(--lime); }
+  .harrow { text-align:center; font-size:18px; line-height:1; margin:10px 0; color:var(--ink); }
+  .hmerge { display:grid; grid-template-columns:1fr 1fr; margin:2px 0 0; }
+  .hmerge div { text-align:center; font-size:18px; color:var(--ink); }
+  .htags { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .htag { font-family:'IBM Plex Mono',monospace; font-size:9.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; border:1.5px solid var(--ink); border-radius:4px; padding:2px 7px; background:var(--paper); color:var(--ink); }
+  .hbox.dark .htag { background:transparent; border-color:var(--lime); color:var(--lime); }
+  @media (max-width:760px){ .how { padding:20px 18px 26px; } .how-cols { grid-template-columns:1fr; } .hmerge { grid-template-columns:1fr; } .hmerge div:last-child { display:none; } }
+
   .lab { font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:22px 0 10px; }
   .bullet { border-left:3px solid var(--lime); padding:2px 0 2px 13px; margin-bottom:12px; }
   .bullet .t { font-size:13.5px; line-height:1.5; }
@@ -207,6 +226,50 @@
         <h3>Built for a market AI keeps redrawing.</h3>
         <p>Matching on <b>evidence, not titles</b> re-maps you to whatever the market becomes.
         And nothing is fabricated — every resume line traces back to something you did.</p>
+      </div>
+    </div>
+    <div class="how">
+      <div class="eyebrow">How it works</div>
+      <div class="how-cols">
+        <div>
+          <div class="hbox">
+            <div class="hn">You enter</div>
+            <h4>Your transcript, as-is</h4>
+            <p>Subject codes · marks · which subjects you enjoyed · other skills &amp; experience (Excel, software, projects).</p>
+          </div>
+          <div class="harrow">↓</div>
+          <div class="hbox dark">
+            <div class="hn">The app builds</div>
+            <h4>Your candidate profile</h4>
+            <p>Each code is enriched with its official handbook content and distilled into a searchable skills profile — every skill cites the subject and mark that proves it.</p>
+          </div>
+        </div>
+        <div>
+          <div class="hbox">
+            <div class="hn">In the background · refreshed daily</div>
+            <h4>The job market, indexed</h4>
+            <p>Live job ads ingested from public job APIs and official employer career boards, saved as a searchable job index.</p>
+          </div>
+          <div class="harrow">↓</div>
+          <div class="hbox dark">
+            <div class="hn">The market side</div>
+            <h4>Job description index</h4>
+            <p>Every ad's requirements, title and full text — ready to be matched against your profile.</p>
+          </div>
+        </div>
+      </div>
+      <div class="hmerge"><div>↘</div><div>↙</div></div>
+      <div class="hbox lime" style="max-width:640px;margin:0 auto">
+        <div class="hn">The match</div>
+        <h4>A logical score, 0–100 — from marks, interest, skills and the ad itself</h4>
+        <p>Not just roles in your field: <b>every</b> opportunity your evidence supports, including adjacent ones — because grads can't afford to wait for the perfect title.</p>
+        <div class="htags"><span class="htag">Aligned</span><span class="htag">Adjacent</span><span class="htag">Stretch</span></div>
+      </div>
+      <div class="harrow">↓</div>
+      <div class="hbox" style="max-width:640px;margin:0 auto">
+        <div class="hn">The output</div>
+        <h4>A ready-to-send application</h4>
+        <p>Tailored resume bullets · cover letter · LinkedIn mentor link-outs to reach real people — all traced to what you actually did.</p>
       </div>
     </div>
     <div class="pitch-dark">
